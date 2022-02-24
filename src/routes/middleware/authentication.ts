@@ -1,14 +1,15 @@
 const jwt = require("jsonwebtoken");
-import express from "express";
-
+import express, { response } from "express";
+import {ApiResponseDto} from "../../dto/response.dto";
 module.exports = (req:express.Request, res:express.Response, next:express.NextFunction) => {
     try {
-        const token = req.headers.authorization.split(" ")[1];
+        const response=res as ApiResponseDto;
+        const token:string = req.headers.authorization.split(" ")[1];
         if (!token)
-            return res.status(401).json({ message: "Authentication Failed" });
-        res.decodedData = jwt.verify(token, process.env.secretKey!);
+            return response.status(401).json({ message: "Authentication Failed" });
+        response.decodedData = <ApiResponseDto>jwt.verify(token, process.env.secretKey!);
         next();
     } catch (error:any) {
-        return res.status(401).json({ message: "Authentication Failed" });
+        return response.status(401).json({ message: "Authentication Failed" });
     }
 };

@@ -1,7 +1,7 @@
 import {Document,Schema,model} from "mongoose";
 import { UserDto } from "../dto/user.dto";
 
-const userSchema = new Schema<UserDto&Document>({
+const userSchema:Schema = new Schema<UserDto>({
     name: {
         type: String,
         required: true,
@@ -37,4 +37,4 @@ const userSchema = new Schema<UserDto&Document>({
     },
 });
 
-module.exports = model("User", userSchema);
+module.exports = model<UserDto>("User", userSchema);

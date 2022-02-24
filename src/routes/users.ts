@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const router = express.Router();
 const User = require("../models/user");
 import { ObjectId } from "mongoose";
+import { ApiResponseDto } from "../dto/response.dto";
 const authentication = require("./middleware/authentication");
 
 //Get all users
@@ -19,13 +20,14 @@ router.get("/", async (req:express.Request, res:express.Response) => {
 
 //Create user
 router.post("/signup", async (req:express.Request, res:express.Response) => {
+    const response=res as ApiResponseDto;
     try {
         const existingUser:UserDto = await User.findOne({ email: req.body.email });
         if (existingUser != null)
-            return res.status(400).json({ message: "User already exists" });
+            return response.status(400).json({ message: "User already exists" });
         const hash:string = await bcrypt.hash(req.body.password, 10);
         
-        const user = new User({
+        const user:UserDto = new User({
             name: req.body.name,
             email: req.body.email,
             password: hash,
@@ -33,23 +35,23 @@ router.post("/signup", async (req:express.Request, res:express.Response) => {
             gender: req.body.gender,
         });
         const newUser:UserDto = await user.save();
-        res.json(newUser);
+        response.json(newUser);
     } catch (error:any) {
-        res.status(400).json({ message: error.message });
+        response.status(400).json({ message: error.message });
     }
 });
 
 //Get User
 router.post("/login", async (req:express.Request, res:express.Response) => {
     try {
-        const user = await User.findOne({ email: req.body.email });
+        const user:UserDto = await User.findOne({ email: req.body.email });
         console.log("FOUND ",user);
         if (user == null)
             return res.status(401).json({ message: "Invalid credentials" });
         const result:boolean = await bcrypt.compare(req.body.password, user.password);
         if (!result)
             return res.status(401).json({ message: "Invalid credentials" });
-        const loggedInUser = await user.save();
+        const loggedInUser:UserDto = await user.save();
         console.log("loggedInUser ",loggedInUser);
         res.json({
             ...loggedInUser.toObject(),
@@ -62,49 +64,54 @@ router.post("/login", async (req:express.Request, res:express.Response) => {
 
 //Get User
 router.get("/:id", authentication, getUser, (req:express.Request, res:express.Response) => {
-    res.json(res.user);
+    const response=res as ApiResponseDto;
+    response.json(response.user);
 });
 
 //Delete User
 router.get("/delete/:id", authentication, getUser, async (req:express.Request, res:express.Response) => {
+    const response= res as ApiResponseDto;
     try {
-        await res.user.remove();
-        res.json({ message: "User deleted" });
+
+        await response.user.remove();
+        response.json({ message: "User deleted" });
     } catch (error:any) {
-        res.status(500).json({ message: error.message });
+        response.status(500).json({ message: error.message });
     }
 });
 
 //Update User
 router.post("/update/:id", authentication, getUser, async (req:express.Request, res:express.Response) => {
+    const response=res as ApiResponseDto;
     if (req.body.name != null) {
-        res.user.name = req.body.name;
+        response.user.name = req.body.name;
     }
     if (req.body.email != null) {
-        res.user.email = req.body.email;
+        response.user.email = req.body.email;
     }
-    res.user.updatedAt = Date.now();
+    response.user.updatedAt = Date.now();
     try {
-        const updatedUser:UserDto = await res.user.save();
-        res.json(updatedUser);
+        const updatedUser:UserDto = await response.user.save();
+        response.json(updatedUser);
     } catch (error:any) {
-        res.status(400).json({ message: error.message });
+        response.status(400).json({ message: error.message });
     }
 });
 
 //Follow User
 router.post("/follow", authentication, async (req:express.Request, res:express.Response) => {
+    const response=res as ApiResponseDto;
     try {
-        const user = await User.findById(req.body.userID);
+        const user:UserDto = await User.findById(req.body.userID);
         if (user === null)
-            return res.status(404).json({ message: "Cannot find user" });
+            return response.status(404).json({ message: "Cannot find user" });
         if (
             user.followingList.length &&
             user.followingList.includes(req.body.followerID)
         )
-            return res.status(400).json({ message: "Already a follower" });
+            return response.status(400).json({ message: "Already a follower" });
         user.followingList.push(req.body.followerID);
-        res.json(await user.save());
+        response.json(await user.save());
     } catch (error:any) {
         return res.status(500).json({ message: error.message });
     }
@@ -112,32 +119,40 @@ router.post("/follow", authentication, async (req:express.Request, res:express.R
 
 //Unfollow User
 router.post("/unfollow", authentication, async (req:express.Request, res:express.Response) => {
+    const response=res as ApiResponseDto;
     try {
-        const user = await User.findById(req.body.userID);
+        const user:UserDto = await User.findById(req.body.userID);
         if (user === null)
-            return res.status(404).json({ message: "Cannot find user" });
+            return response.status(404).json({ message: "Cannot find user" });
         const followingList = user.followingList.filter(
             (id: ObjectId) => id !== req.body.followerID
         );
         user.followingList = followingList;
-        res.json(await user.save());
+        response.json(await user.save());
     } catch (error:any) {
         return res.status(500).json({ message: error.message });
     }
 });
 
 //Middleware to get the user from ID
-async function getUser(req:express.Request, res:express.Response, next:express.NextFunction) {
+async function getUser(req:express.Request, res:ApiResponseDto, next:express.NextFunction) {
     let user: UserDto;
+    const response=res as ApiResponseDto;
     try {
         user = await User.findById(req.params.id);
         if (user === null)
-            return res.status(404).json({ message: "Cannot find user" });
-    } catch (error:any) {
-        return res.status(500).json({ message: error.message });
+            return response.status(404).json({ message: "Cannot find user" });
+    } catch (error: any){
+        // function isError(something:any): something is Error{
+        //     return something.message!==null;
+        // }
+        // if(isError)
+        // {
+            return response.status(500).json({ message: error.message });
+        //}
     }
     
-    res.user = user;
+    response.user = user;
     next();
 }
 

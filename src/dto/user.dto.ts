@@ -1,5 +1,5 @@
-import { ObjectId } from "mongoose";
-export interface UserDto {
+import { Document, ObjectId } from "mongoose";
+export interface UserDto extends Document{
     followingList: Array<ObjectId>;
     id: string;
     name:string;
@@ -8,5 +8,5 @@ export interface UserDto {
     DOB: Date;
     gender: string;
     createdAt:Date;
-    updatedAt?: Date;
+    updatedAt?: number;
 }

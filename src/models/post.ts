@@ -1,7 +1,7 @@
 import {Document,Schema,model} from "mongoose";
 import { PostDto } from "../dto/post.dto";
 
-const postSchema = new Schema<PostDto&Document>({
+const postSchema:Schema = new Schema<PostDto>({
     userID: {
         type: String,
         required: true,
@@ -25,4 +25,4 @@ const postSchema = new Schema<PostDto&Document>({
     },
 });
 
-module.exports = model("Post", postSchema);
+module.exports = model<PostDto>("Post", postSchema);

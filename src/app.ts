@@ -2,12 +2,12 @@ require("dotenv").config();
 import express from "express";
 import { Socket } from "socket.io";
 const app = express();
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 
 app.use(express.json());
-server.listen(3000, () => {
+server.listen(8000, () => {
     console.log("server started....");
 });
 
@@ -17,7 +17,7 @@ app.set("socketIO", io);
 
 //Setting up feed write just to see live events log
 app.get("/feed", (req:express.Request, res:express.Response) => {
-    res.render("feed");
+    res.render("../dist/views/feed.ejs");
 });
 
 //Setting user routes
