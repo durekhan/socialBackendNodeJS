@@ -7,7 +7,7 @@ const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 
 app.use(express.json());
-server.listen(8000, () => {
+server.listen(3000, () => {
     console.log("server started....");
 });
 
@@ -42,3 +42,4 @@ db.once("open", () => console.log("Connected to db successfully"));
 io.on("connection", (socket:Socket) => {
     console.log("A user is connected with socket id:", socket.id);
 });
+module.exports = {app,db} ; // for testing

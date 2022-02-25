@@ -1,7 +1,7 @@
 import {Document,Schema,model} from "mongoose";
 import { PostDto } from "../dto/post.dto";
 
-const postSchema:Schema = new Schema<PostDto>({
+const postSchema:Schema = new Schema({
     userID: {
         type: String,
         required: true,

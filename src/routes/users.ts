@@ -10,11 +10,12 @@ const authentication = require("./middleware/authentication");
 
 //Get all users
 router.get("/", async (req:express.Request, res:express.Response) => {
+    const response=res as ApiResponseDto;
     try {
         const users:UserDto[] = await User.find();
-        res.json(users);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+        response.json(users);
+    } catch (error:any) {
+        response.status(500).json({ message: error.message });
     }
 });
 
@@ -44,15 +45,16 @@ router.post("/signup", async (req:express.Request, res:express.Response) => {
 //Get User
 router.post("/login", async (req:express.Request, res:express.Response) => {
     try {
+        console.log("INSIDE LOGIN CONTROLLER ");
         const user:UserDto = await User.findOne({ email: req.body.email });
-        console.log("FOUND ",user);
+        
         if (user == null)
             return res.status(401).json({ message: "Invalid credentials" });
         const result:boolean = await bcrypt.compare(req.body.password, user.password);
         if (!result)
             return res.status(401).json({ message: "Invalid credentials" });
         const loggedInUser:UserDto = await user.save();
-        console.log("loggedInUser ",loggedInUser);
+        
         res.json({
             ...loggedInUser.toObject(),
             token: getToken(user.email,user.id),
@@ -73,7 +75,7 @@ router.get("/delete/:id", authentication, getUser, async (req:express.Request, r
     const response= res as ApiResponseDto;
     try {
 
-        await response.user.remove();
+        await response.user!.remove();
         response.json({ message: "User deleted" });
     } catch (error:any) {
         response.status(500).json({ message: error.message });
@@ -84,14 +86,14 @@ router.get("/delete/:id", authentication, getUser, async (req:express.Request, r
 router.post("/update/:id", authentication, getUser, async (req:express.Request, res:express.Response) => {
     const response=res as ApiResponseDto;
     if (req.body.name != null) {
-        response.user.name = req.body.name;
+        response.user!.name = req.body.name;
     }
     if (req.body.email != null) {
-        response.user.email = req.body.email;
+        response.user!.email = req.body.email;
     }
-    response.user.updatedAt = Date.now();
+    response.user!.updatedAt = Date.now();
     try {
-        const updatedUser:UserDto = await response.user.save();
+        const updatedUser:UserDto = await response.user!.save();
         response.json(updatedUser);
     } catch (error:any) {
         response.status(400).json({ message: error.message });

@@ -1,7 +1,7 @@
 import {Document,Schema,model} from "mongoose";
 import { UserDto } from "../dto/user.dto";
 
-const userSchema:Schema = new Schema<UserDto>({
+const userSchema:Schema = new Schema({
     name: {
         type: String,
         required: true,

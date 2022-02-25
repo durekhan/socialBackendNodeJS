@@ -84,7 +84,7 @@ router.get("/:id", authentication, getPost, (req:express.Request, res:express.Re
 router.get("/delete/:id", authentication, getPost, async (req:express.Request, res:express.Response) => {
     const response=res as ApiResponseDto;
     try {
-        await response.post.remove();
+        await response.post!.remove();
         response.json({ message: "Post deleted" });
     } catch (error:any) {
         response.status(500).json({ message: error.message });
@@ -95,11 +95,11 @@ router.get("/delete/:id", authentication, getPost, async (req:express.Request, r
 router.post("/update/:id", authentication, getPost, async (req:express.Request, res:express.Response) => {
     const response=res as ApiResponseDto;
     if (req.body.caption != null) {
-        response.post.caption = req.body.caption;
+        response.post!.caption = req.body.caption;
     }
-    response.post.updatedAt = Date.now();
+    response.post!.updatedAt = Date.now();
     try {
-        const updatedPost:PostDto = await response.post.save();
+        const updatedPost:PostDto = await response.post!.save();
         response.json(updatedPost);
     } catch (error:any) {
         response.status(400).json({ message: error.message });
