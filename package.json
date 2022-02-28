@@ -4,7 +4,8 @@
     "description": "Social Backend",
     "main": "./dist/app.js",
     "scripts": {
-        "test": "mocha -r ts-node/register 'tests/**/*.spec.ts'",
+        "test": "mocha -r ts-node/register 'tests/**/*.spec.ts' --timeout 10000 --exit--",
+        "coverage":"nyc --reporter=text npm run test",
         "devStart": "nodemon ./dist/app.js"
     },
     "author": "Umer Saleem",

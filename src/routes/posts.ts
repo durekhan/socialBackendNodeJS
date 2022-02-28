@@ -37,6 +37,7 @@ router.get("/feed", authentication, async (req:express.Request, res:express.Resp
     const limit = 3;
     try {
         const user:UserDto = await User.findById(req.query.id);
+        console.log(req.query.filter);
         if (user === null)
             return res.status(401).json({ message: "User not found" });
         let posts:PostDto[] = await Post.find({
@@ -44,10 +45,13 @@ router.get("/feed", authentication, async (req:express.Request, res:express.Resp
         })
             .skip((page as number - 1) * limit)
             .limit(limit);
-        if (req.query.filter)
+        if (req.query.filter){
+            
             posts = posts.filter((post:PostDto) =>
                 post.caption.includes(req.query.filter as string)
             );
+        }
+        
         response.json(posts);
     } catch (error:any) {
         response.status(500).json({ message: error.message });

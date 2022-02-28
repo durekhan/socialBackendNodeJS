@@ -4,7 +4,7 @@ import {ApiResponseDto} from "../../dto/response.dto";
 module.exports = (req:express.Request, res:express.Response, next:express.NextFunction) => {
     try {
         const response=res as ApiResponseDto;
-        console.log("AUTHORIZZZAATIONNN ",req.headers.authorization);
+        
         const token:string = req.headers.authorization!.split(" ")[1];
         if (!token)
             return response.status(401).json({ message: "Authentication Failed" });

@@ -28,6 +28,7 @@ app.use("/users", usersRoutes);
 const postsRoutes = require("./routes/posts");
 app.use("/posts", postsRoutes);
 
+
 mongoose.connect(process.env.DB_URL!, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -42,4 +43,4 @@ db.once("open", () => console.log("Connected to db successfully"));
 io.on("connection", (socket:Socket) => {
     console.log("A user is connected with socket id:", socket.id);
 });
-module.exports = {app,db} ; // for testing
+module.exports = {app} ; // for testing

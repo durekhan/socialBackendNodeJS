@@ -36,6 +36,7 @@ router.post("/signup", async (req:express.Request, res:express.Response) => {
             gender: req.body.gender,
         });
         const newUser:UserDto = await user.save();
+       
         response.json(newUser);
     } catch (error:any) {
         response.status(400).json({ message: error.message });
@@ -45,7 +46,7 @@ router.post("/signup", async (req:express.Request, res:express.Response) => {
 //Get User
 router.post("/login", async (req:express.Request, res:express.Response) => {
     try {
-        console.log("INSIDE LOGIN CONTROLLER ");
+        
         const user:UserDto = await User.findOne({ email: req.body.email });
         
         if (user == null)
@@ -74,7 +75,7 @@ router.get("/:id", authentication, getUser, (req:express.Request, res:express.Re
 router.get("/delete/:id", authentication, getUser, async (req:express.Request, res:express.Response) => {
     const response= res as ApiResponseDto;
     try {
-
+        
         await response.user!.remove();
         response.json({ message: "User deleted" });
     } catch (error:any) {
@@ -85,6 +86,7 @@ router.get("/delete/:id", authentication, getUser, async (req:express.Request, r
 //Update User
 router.post("/update/:id", authentication, getUser, async (req:express.Request, res:express.Response) => {
     const response=res as ApiResponseDto;
+    
     if (req.body.name != null) {
         response.user!.name = req.body.name;
     }
@@ -142,6 +144,7 @@ async function getUser(req:express.Request, res:ApiResponseDto, next:express.Nex
     const response=res as ApiResponseDto;
     try {
         user = await User.findById(req.params.id);
+        
         if (user === null)
             return response.status(404).json({ message: "Cannot find user" });
     } catch (error: any){
